@@ -19,6 +19,7 @@
     "pg": "^8.13.3"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.8",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.5",
     "ts-node": "^10.9.2",
