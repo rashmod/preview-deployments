@@ -28,8 +28,14 @@ jobs:
 
       - name: Read Fly.io App Name
         run: |
-          echo "BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)" >> $GITHUB_ENV
-          echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
+          BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)
+          FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)
+
+          echo "Backend App Name: $BACKEND_APP_NAME"
+          echo "Frontend App Name: $FRONTEND_APP_NAME"
+
+          echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
+          echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
       - name: Deploy backend
         uses: superfly/fly-pr-review-apps@main
