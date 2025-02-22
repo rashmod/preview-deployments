@@ -43,7 +43,7 @@ jobs:
           postgres: backend-wild-firefly-7466-db
 
       - name: Print backend URL
-        run:
+        run: |
           echo "Backend URL: ${{ steps.deploy-backend.outputs.url }}"
 
       - name: Deploy frontend
