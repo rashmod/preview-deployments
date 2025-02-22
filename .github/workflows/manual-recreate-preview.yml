@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Fly.io CLI
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Read Fly.io App Name
@@ -21,11 +23,11 @@ jobs:
 
       - name: Deploy Backend to Fly.io
         working-directory: backend
-        run: fly deploy --remote-only --app ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
+        run: flyctl deploy --remote-only --app ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
 
       - name: Deploy Frontend to Fly.io
         working-directory: frontend
-        run: fly deploy --remote-only --app ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
+        run: flyctl deploy --remote-only --app ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
 
       - name: Deploy Database
-        run: fly postgres create --name ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --volume-size=1 --vm-size shared-cpu-1x --region sea
+        run: flyctl postgres create --name ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --volume-size=1 --vm-size shared-cpu-1x --region sea
