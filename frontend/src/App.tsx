@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   useEffect(() => {
-    fetch("http://localhost:3000/hello")
+    fetch(`${API_URL}/hello`)
       .then((response) => response.text())
       .then((data) => console.log(data))
       .catch((error) => console.error(error));
 
     fetch(
-      `http://localhost:3000/hello/${Math.floor(Math.random() * 10e16)
+      `${API_URL}/hello/${Math.floor(Math.random() * 10e16)
         .toString(16)
         .toUpperCase()}`,
     )
@@ -16,7 +18,7 @@ function App() {
       .then((data) => console.log(data))
       .catch((error) => console.error(error));
 
-    fetch("http://localhost:3000/todos")
+    fetch(`${API_URL}/todos`)
       .then((response) => response.json())
       .then((data) => console.log(data))
       .catch((error) => console.error(error));
