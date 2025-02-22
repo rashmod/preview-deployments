@@ -12,6 +12,15 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.get("/hello", (req, res) => {
+  res.send("Hello!");
+});
+
+app.get("/hello/:name", (req, res) => {
+  const name = req.params.name;
+  res.send(`Hello, ${name}!`);
+});
+
 app.get("/todos", async (req, res) => {
   const todos = await prisma.todo.findMany();
   res.json(todos);
