@@ -6,6 +6,10 @@
 app = 'backend-wild-firefly-7466'
 primary_region = 'ams'
 
+[build]
+  dockerfile = 'Dockerfile'
+  ignorefile = '.dockerignore'
+
 [http_service]
   internal_port = 3000
   force_https = true
