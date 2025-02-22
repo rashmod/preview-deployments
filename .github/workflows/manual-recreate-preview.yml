@@ -1,0 +1,33 @@
+name: Manual Recreate Preview
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR Number"
+        required: true
+
+jobs:
+  recreate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Fly.io CLI
+        run: npm install -g flyctl
+
+      - name: Read Fly.io App Name
+        run: |
+          echo "BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)" >> $GITHUB_ENV
+          echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
+
+      - name: Deploy Backend to Fly.io
+        working-directory: backend
+        run: fly deploy --remote-only --app ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
+
+      - name: Deploy Frontend to Fly.io
+        working-directory: frontend
+        run: fly deploy --remote-only --app ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
+
+      - name: Deploy Database
+        run: fly postgres create --name ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --volume-size=1 --vm-size shared-cpu-1x --region sea
