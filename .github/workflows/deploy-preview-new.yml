@@ -32,6 +32,16 @@ jobs:
           echo "BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)" >> $GITHUB_ENV
           echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
 
+      - name: Print Fly.io App Name
+        run: |
+          echo ${{ env.BACKEND_APP_NAME }}
+          echo ${{ env.FRONTEND_APP_NAME }}
+
+      - name: Print Fly.io App Name from vars
+        run: |
+          echo ${{ vars.BACKEND_APP_NAME }}
+          echo ${{ vars.FRONTEND_APP_NAME }}
+
       - name: Deploy backend
         uses: superfly/fly-pr-review-apps@main
         with:
