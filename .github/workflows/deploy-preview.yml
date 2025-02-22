@@ -40,6 +40,7 @@ jobs:
         with:
           path: backend
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
+          postgres: backend-wild-firefly-7466-db
 
       - name: Deploy frontend
         id: deploy-frontend
