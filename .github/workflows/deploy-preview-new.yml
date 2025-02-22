@@ -36,14 +36,10 @@ jobs:
         uses: superfly/fly-pr-review-apps@main
         with:
           path: backend
-          name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
-        env:
-          BACKEND_APP_NAME: ${{ env.BACKEND_APP_NAME }}
+          name: pr-${{ github.event.number }}-${{ vars.BACKEND_APP_NAME }}
 
       - name: Deploy frontend
         uses: superfly/fly-pr-review-apps@main
         with:
           path: frontend
-          name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
-        env:
-          FRONTEND_APP_NAME: ${{ env.FRONTEND_APP_NAME }}
+          name: pr-${{ github.event.number }}-${{ vars.FRONTEND_APP_NAME }}
