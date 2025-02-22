@@ -39,19 +39,14 @@ jobs:
           echo ${{ env.BACKEND_APP_NAME }}
           echo ${{ env.FRONTEND_APP_NAME }}
 
-      - name: Print Fly.io App Name from vars
-        run: |
-          echo ${{ vars.BACKEND_APP_NAME }}
-          echo ${{ vars.FRONTEND_APP_NAME }}
-
       - name: Deploy backend
         uses: superfly/fly-pr-review-apps@main
         with:
           path: backend
-          name: pr-${{ github.event.number }}-${{ vars.BACKEND_APP_NAME }}
+          name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
 
       - name: Deploy frontend
         uses: superfly/fly-pr-review-apps@main
         with:
           path: frontend
-          name: pr-${{ github.event.number }}-${{ vars.FRONTEND_APP_NAME }}
+          name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
