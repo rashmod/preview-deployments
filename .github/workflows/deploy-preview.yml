@@ -48,3 +48,4 @@ jobs:
         with:
           path: frontend
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
+          secrets: VITE_API_URL=${{ steps.deploy-backend.outputs.url }}
