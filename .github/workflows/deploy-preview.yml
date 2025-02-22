@@ -1,30 +1,46 @@
-name: Deploy PR Preview
+name: Preview App
+
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, reopened, synchronize, closed]
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
 
 jobs:
-  deploy:
+  staging_app:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Setup Fly.io CLI
-        uses: superfly/flyctl-actions/setup-flyctl@master
+    # Only run one deployment at a time per PR.
+    concurrency:
+      group: pr-${{ github.event.number }}
+
+    # Create a GitHub deployment environment per staging app so it shows up
+    # in the pull request UI.
+    environment:
+      name: pr-${{ github.event.number }}
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Read Fly.io App Name
         run: |
-          echo "BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)" >> $GITHUB_ENV
-          echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
+          BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' backend/fly.toml)
+          FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' frontend/fly.toml)
+          echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
+          echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
-      - name: Deploy Backend to Fly.io
-        working-directory: backend
-        run: flyctl deploy --remote-only --app ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
+      - name: Deploy backend
+        uses: superfly/fly-pr-review-apps@main
+        with:
+          path: backend
+          name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
 
-      - name: Deploy Frontend to Fly.io
-        working-directory: frontend
-        run: flyctl deploy --remote-only --app ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }}
-
-      - name: Deploy Database
-        run: flyctl postgres create --name ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --volume-size=1 --vm-size shared-cpu-1x --region sea
+      - name: Deploy frontend
+        uses: superfly/fly-pr-review-apps@main
+        with:
+          path: frontend
+          name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
