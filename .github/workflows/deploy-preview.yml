@@ -19,7 +19,8 @@ jobs:
     # in the pull request UI.
     environment:
       name: pr-${{ github.event.number }}
-      url: ${{ steps.deploy.outputs.url }}
+      frontend: ${{ steps.deploy-frontend.outputs.url }}
+      backend: ${{ steps.deploy-backend.outputs.url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +35,14 @@ jobs:
           echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
       - name: Deploy backend
+        id: deploy-backend
         uses: superfly/fly-pr-review-apps@main
         with:
           path: backend
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
 
       - name: Deploy frontend
+        id: deploy-frontend
         uses: superfly/fly-pr-review-apps@main
         with:
           path: frontend
