@@ -29,8 +29,10 @@ jobs:
 
       - name: Read Fly.io App Name
         run: |
-          echo "BACKEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' backend/fly.toml)" >> $GITHUB_ENV
-          echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
+          BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' backend/fly.toml)
+          FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' frontend/fly.toml)
+          echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
+          echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
       - name: Print Fly.io App Name
         run: |
