@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { connectDatabase } from "./db";
+import { connectDatabase, prisma } from "./db";
 
 dotenv.config();
 
@@ -10,6 +10,11 @@ const app = express();
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
+});
+
+app.get("/todos", async (req, res) => {
+  const todos = await prisma.todo.findMany();
+  res.json(todos);
 });
 
 app.listen(3000, () => {
