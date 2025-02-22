@@ -19,8 +19,8 @@ jobs:
     # in the pull request UI.
     environment:
       name: pr-${{ github.event.number }}
-      frontend: ${{ steps.deploy-frontend.outputs.url }}
-      backend: ${{ steps.deploy-backend.outputs.url }}
+      url: ${{ steps.deploy-frontend.outputs.url }}
+      # backend: ${{ steps.deploy-backend.outputs.url }}
 
     steps:
       - uses: actions/checkout@v4
