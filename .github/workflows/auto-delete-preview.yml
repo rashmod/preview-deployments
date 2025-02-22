@@ -19,10 +19,10 @@ jobs:
           echo "FRONTEND_APP_NAME=$(grep -oP '(?<=app = ").*(?=")' frontend/fly.toml)" >> $GITHUB_ENV
 
       - name: Delete Backend
-        run: fly apps destroy ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }} --yes
+        run: flyctl apps destroy ${{ env.BACKEND_APP_NAME }}-pr-${{ github.event.pull_request.number }} --yes
 
       - name: Delete Frontend
-        run: fly apps destroy ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }} --yes
+        run: flyctl apps destroy ${{ env.FRONTEND_APP_NAME }}-pr-${{ github.event.pull_request.number }} --yes
 
       - name: Delete Database
-        run: fly postgres delete ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --yes
+        run: flyctl postgres delete ${{ env.BACKEND_APP_NAME }}-db-pr-${{ github.event.pull_request.number }} --yes
