@@ -8,8 +8,8 @@ on:
       - ".github/workflows/deploy-frontend.yml"
 
 jobs:
-  deploy-frontend:
-    name: Deploy Frontend
+  deploy:
+    name: Deploy app
     runs-on: ubuntu-latest
     concurrency: deploy-frontend
     defaults:

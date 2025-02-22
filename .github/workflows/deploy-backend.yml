@@ -2,7 +2,7 @@ name: Fly Deploy - Backend
 on:
   push:
     branches:
-      - master # change to main if needed
+      - master
     paths:
       - "backend/**"
       - ".github/workflows/deploy-backend.yml"
@@ -10,7 +10,7 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    concurrency: deploy-group # optional: ensure only one action runs at a time
+    concurrency: deploy-backend
     defaults:
       run:
         working-directory: backend
