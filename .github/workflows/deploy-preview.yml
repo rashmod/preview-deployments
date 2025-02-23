@@ -42,10 +42,6 @@ jobs:
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
           postgres: backend-wild-firefly-7466-db
 
-      - name: Print backend URL
-        run: |
-          echo "Backend URL: ${{ steps.deploy-backend.outputs.url }}"
-
       - name: Deploy frontend
         id: deploy-frontend
         uses: superfly/fly-pr-review-apps@main
