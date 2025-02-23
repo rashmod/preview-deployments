@@ -16,6 +16,9 @@ ENV NODE_ENV="production"
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+# Log the build arguments to verify they are received
+RUN echo "VITE_API_URL at build time: $VITE_API_URL"
+
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
