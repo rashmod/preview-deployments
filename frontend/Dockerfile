@@ -12,9 +12,19 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
+# Accept build arguments
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# Log the build arguments to verify they are received
+RUN echo "VITE_API_URL at build time: $VITE_API_URL"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+
+# Accept build arguments
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -26,6 +36,9 @@ RUN npm ci --include=dev
 
 # Copy application code
 COPY . .
+
+# Log the build arguments to verify they are received
+RUN echo "VITE_API_URL at build time: $VITE_API_URL"
 
 # Build application
 RUN npm run build

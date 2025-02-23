@@ -19,7 +19,8 @@ jobs:
     # in the pull request UI.
     environment:
       name: pr-${{ github.event.number }}
-      url: ${{ steps.deploy.outputs.url }}
+      url: ${{ steps.deploy-frontend.outputs.url }}
+      # backend: ${{ steps.deploy-backend.outputs.url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +35,18 @@ jobs:
           echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
       - name: Deploy backend
-        uses: superfly/fly-pr-review-apps@main
+        id: deploy-backend
+        uses: rashmod/fly-pr-review-apps@main
         with:
           path: backend
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
+          postgres: backend-wild-firefly-7466-db
 
       - name: Deploy frontend
-        uses: superfly/fly-pr-review-apps@main
+        id: deploy-frontend
+        uses: rashmod/fly-pr-review-apps@main
         with:
           path: frontend
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
+          # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
+          build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
