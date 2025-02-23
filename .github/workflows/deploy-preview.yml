@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy backend
         id: deploy-backend
-        uses: rashmod/fly-pr-review-apps@main
+        uses: superfly/fly-pr-review-apps@main
         with:
           path: backend
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
@@ -44,9 +44,8 @@ jobs:
 
       - name: Deploy frontend
         id: deploy-frontend
-        uses: rashmod/fly-pr-review-apps@main
+        uses: superfly/fly-pr-review-apps@main
         with:
           path: frontend
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
           launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
-          # build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
