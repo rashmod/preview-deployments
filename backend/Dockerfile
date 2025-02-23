@@ -24,10 +24,10 @@ COPY package-lock.json package.json ./
 RUN npm ci --include=dev
 
 # Generate Prisma Client
-COPY prisma .
-RUN --mount=type=secret,id=DATABASE_URL \
-    DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
-    npx prisma generate
+# COPY prisma .
+# RUN --mount=type=secret,id=DATABASE_URL \
+#     DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
+#     npx prisma generate
 
 # Copy application code
 COPY . .
@@ -49,6 +49,8 @@ RUN apt-get update -qq && \
 
 # Copy built application
 COPY --from=build /app /app
+
+RUN npx prisma generate
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
