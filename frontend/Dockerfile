@@ -19,6 +19,10 @@ ENV VITE_API_URL=$VITE_API_URL
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+# Accept build arguments
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
