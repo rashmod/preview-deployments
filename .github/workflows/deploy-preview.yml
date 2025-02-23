@@ -52,4 +52,4 @@ jobs:
         with:
           path: frontend
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
-          launch_options: --build-args=VITE_API_URL=${{ steps.deploy-backend.outputs.url }}
+          launch_options: --build-arg=VITE_API_URL=${{ steps.deploy-backend.outputs.url }}
