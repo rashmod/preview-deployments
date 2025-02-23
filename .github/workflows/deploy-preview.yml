@@ -42,7 +42,7 @@ jobs:
           path: backend
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
           postgres: backend-wild-firefly-7466-db
-          launch_options: "--build-arg DATABASE_URL=${{ secrets.DATABASE_URL }}"
+          launch_options: "--build-secret DATABASE_URL=${{ secrets.DATABASE_URL }}"
 
       - name: Deploy frontend
         id: deploy-frontend
