@@ -12,7 +12,6 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
@@ -25,8 +24,8 @@ COPY package-lock.json package.json ./
 RUN npm ci --include=dev
 
 # Generate Prisma Client
-COPY prisma .
-RUN npx prisma generate
+# COPY prisma .
+# RUN npx prisma generate
 
 # Copy application code
 COPY . .
