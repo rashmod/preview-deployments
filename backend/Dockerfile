@@ -24,8 +24,10 @@ COPY package-lock.json package.json ./
 RUN npm ci --include=dev
 
 # Generate Prisma Client
-# COPY prisma .
-# RUN npx prisma generate
+COPY prisma .
+RUN --mount=type=secret,id=DATABASE_URL \
+    DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
+    npx prisma generate
 
 # Copy application code
 COPY . .
