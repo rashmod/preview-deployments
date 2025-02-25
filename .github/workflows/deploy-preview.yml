@@ -31,7 +31,7 @@ jobs:
         run: npm run lint --prefix frontend
 
   preview-deploy:
-    needs: lint
+    needs: setup
     runs-on: ubuntu-latest
 
     # Only run one deployment at a time per PR.
