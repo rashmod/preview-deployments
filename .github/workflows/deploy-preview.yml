@@ -21,14 +21,24 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install --prefix frontend
-          npm install --prefix backend
+          npm ci --prefix frontend
+          npm ci --prefix backend
 
       - name: Run lint for backend
         run: npm run lint --prefix backend
 
       - name: Run lint for frontend
         run: npm run lint --prefix frontend
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests for backend
+        run: npm run test --prefix backend
 
   preview-deploy:
     needs: setup
