@@ -31,11 +31,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run lint for frontend
-        run: npm run lint --prefix frontend
-
       - name: Run lint for backend
         run: npm run lint --prefix backend
+
+      - name: Run lint for frontend
+        run: npm run lint --prefix frontend
 
   staging_app:
     needs: lint
