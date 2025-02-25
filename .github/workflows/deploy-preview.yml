@@ -30,7 +30,7 @@ jobs:
       - name: Run lint for frontend
         run: npm run lint --prefix frontend
 
-  staging_app:
+  preview-deploy:
     needs: lint
     runs-on: ubuntu-latest
 
@@ -46,7 +46,8 @@ jobs:
       # backend: ${{ steps.deploy-backend.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
