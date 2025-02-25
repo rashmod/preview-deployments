@@ -19,9 +19,20 @@ jobs:
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+
+      # - name: Cache frontend dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: frontend/node_modules
+      #     key: ${{ runner.os }}-frontend-modules-${{ hashFiles('frontend/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-frontend-modules
+
+      - name: Cache backend dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-backend-modules
 
       - name: Install dependencies
         run: |
@@ -40,6 +51,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # - name: Restore frontend dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: frontend/node_modules
+      #     key: ${{ runner.os }}-frontend-modules-${{ hashFiles('frontend/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-frontend-modules
+
+      - name: Restore backend dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-backend-modules
 
       - name: Run tests for backend
         run: npm run test --prefix backend
