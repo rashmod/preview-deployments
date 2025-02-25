@@ -24,13 +24,6 @@ jobs:
           npm install --prefix frontend
           npm install --prefix backend
 
-  lint:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Run lint for backend
         run: npm run lint --prefix backend
 
