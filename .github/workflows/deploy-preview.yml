@@ -8,7 +8,105 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
 
 jobs:
-  staging_app:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Cache frontend dependencies
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-modules-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-frontend-modules
+
+      - name: Cache backend dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-backend-modules
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix backend
+
+      - name: Run lint for backend
+        run: npm run lint --prefix backend
+
+      - name: Run lint for frontend
+        run: npm run lint --prefix frontend
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # - name: Restore frontend dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: frontend/node_modules
+      #     key: ${{ runner.os }}-frontend-modules-${{ hashFiles('frontend/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-frontend-modules
+
+      - name: Restore backend dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-backend-modules
+
+      - name: Run tests for backend
+        run: npm run test --prefix backend
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Restore frontend dependencies
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-modules-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-frontend-modules
+
+      - name: Restore backend dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-modules-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-backend-modules
+
+      - name: Build backend
+        run: npm run build --prefix backend
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+  preview-deploy:
+    needs: build
     runs-on: ubuntu-latest
 
     # Only run one deployment at a time per PR.
@@ -23,7 +121,8 @@ jobs:
       # backend: ${{ steps.deploy-backend.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 

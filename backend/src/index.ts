@@ -24,7 +24,7 @@ app.get("/hello/:name", (req, res) => {
   res.send(`Hello, ${name}!`);
 });
 
-app.get("/todos", async (req, res) => {
+app.get("/todos", async (_req, res) => {
   const todos = await prisma.todo.findMany();
   res.json(todos);
 });
