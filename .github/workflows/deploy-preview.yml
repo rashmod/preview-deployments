@@ -61,6 +61,12 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
       - name: Run tests for frontend
         run: npm run test --prefix frontend
 
