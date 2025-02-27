@@ -98,7 +98,7 @@ function App() {
         <p>Loading...</p>
       ) : (
         <div>
-          {data.map((todo: any) => (
+          {data.map((todo) => (
             <p key={todo.id}>{todo.title}</p>
           ))}
         </div>
