@@ -2,18 +2,18 @@ import { useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,6 +22,28 @@ const formSchema = z.object({
 });
 
 function App() {
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["todos"],
+    queryFn: async () => {
+      const response = await axios.get(`${API_URL}/todos`);
+      const data = await response.data;
+      return data;
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (title: string) => {
+      const response = await axios.post(`${API_URL}/todos`, {
+        title,
+      });
+      const data = await response.data;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,6 +53,8 @@ function App() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    form.reset();
+    mutation.mutate(values.title);
   }
 
   useEffect(() => {
@@ -69,6 +93,16 @@ function App() {
           <Button type="submit">Submit</Button>
         </form>
       </Form>
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          {data.map((todo: any) => (
+            <p key={todo.id}>{todo.title}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
