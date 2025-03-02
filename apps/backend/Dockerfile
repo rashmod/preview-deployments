@@ -19,7 +19,7 @@ LABEL fly_launch_runtime="Node.js/Prisma"
 # Node.js/Prisma app lives here
 WORKDIR /app
 
-COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/json .
 COPY --from=pruner /app/turbo.json ./turbo.json
 
 # Set production environment
