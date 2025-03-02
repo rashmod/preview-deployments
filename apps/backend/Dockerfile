@@ -6,9 +6,7 @@ ARG NODE_VERSION=20.17.0
 FROM node:${NODE_VERSION}-slim AS pruner
 
 WORKDIR /app
-
 RUN npm install -g turbo
-
 COPY . .
 RUN turbo prune --scope=backend --docker
 
@@ -19,7 +17,8 @@ LABEL fly_launch_runtime="Node.js/Prisma"
 # Node.js/Prisma app lives here
 WORKDIR /app
 
-COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/json/package.json ./package.json
+COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 COPY --from=pruner /app/turbo.json ./turbo.json
 
 # Set production environment
