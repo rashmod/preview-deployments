@@ -29,7 +29,6 @@ jobs:
           restore-keys: ${{ runner.os }}-
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --include=dev
 
   lint:
@@ -51,6 +50,9 @@ jobs:
           path: ~/.npm
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci --include=dev
 
       - name: Run lint
         run: npm run lint
