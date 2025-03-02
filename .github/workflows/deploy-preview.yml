@@ -20,7 +20,16 @@ jobs:
           node-version: 18
           cache: npm
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-
+
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Run lint
