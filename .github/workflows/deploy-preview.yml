@@ -103,48 +103,48 @@ jobs:
       - name: Build
         run: npm run build
 
-  # preview-deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
+  preview-deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-  #   # Only run one deployment at a time per PR.
-  #   concurrency:
-  #     group: pr-${{ github.event.number }}
+    # Only run one deployment at a time per PR.
+    concurrency:
+      group: pr-${{ github.event.number }}
 
-  #   # Create a GitHub deployment environment per staging app so it shows up
-  #   # in the pull request UI.
-  #   environment:
-  #     name: pr-${{ github.event.number }}
-  #     url: ${{ steps.deploy-frontend.outputs.url }}
-  #     # backend: ${{ steps.deploy-backend.outputs.url }}
+    # Create a GitHub deployment environment per staging app so it shows up
+    # in the pull request UI.
+    environment:
+      name: pr-${{ github.event.number }}
+      url: ${{ steps.deploy-frontend.outputs.url }}
+      # backend: ${{ steps.deploy-backend.outputs.url }}
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: superfly/flyctl-actions/setup-flyctl@master
 
-  #     - name: Read Fly.io App Name
-  #       run: |
-  #         BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' backend/fly.toml)
-  #         FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' frontend/fly.toml)
-  #         echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
-  #         echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
+      - name: Read Fly.io App Name
+        run: |
+          BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' apps/backend/fly.toml)
+          FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' apps/frontend/fly.toml)
+          echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
+          echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
-  #     - name: Deploy backend
-  #       id: deploy-backend
-  #       uses: rashmod/fly-pr-review-apps@main
-  #       with:
-  #         path: backend
-  #         name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
-  #         postgres: new
-  #         # postgres: backend-wild-firefly-7466-db
+      - name: Deploy backend
+        id: deploy-backend
+        uses: rashmod/fly-pr-review-apps@main
+        with:
+          path: apps/backend
+          name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
+          postgres: new
+          # postgres: backend-wild-firefly-7466-db
 
-  #     - name: Deploy frontend
-  #       id: deploy-frontend
-  #       uses: rashmod/fly-pr-review-apps@main
-  #       with:
-  #         path: frontend
-  #         name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
-  #         # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
-  #         build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
+      - name: Deploy frontend
+        id: deploy-frontend
+        uses: rashmod/fly-pr-review-apps@main
+        with:
+          path: apps/frontend
+          name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
+          # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
+          build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
