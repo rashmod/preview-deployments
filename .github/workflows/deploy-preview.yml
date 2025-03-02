@@ -32,9 +32,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --include=dev
 
-      - name: Run lint
-        run: npm run lint
-
   lint:
     needs: setup
     runs-on: ubuntu-latest
