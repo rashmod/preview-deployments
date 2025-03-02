@@ -56,6 +56,10 @@ jobs:
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: ${{ runner.os }}-
 
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci --include=dev
+
       - name: Run tests
         run: npm run test
 
