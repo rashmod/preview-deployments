@@ -2,12 +2,25 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.17.0
+
+FROM node:${NODE_VERSION}-slim AS pruner
+
+WORKDIR /app
+
+RUN npm install -g turbo
+
+COPY . .
+RUN turbo prune --scope=backend --docker
+
 FROM node:${NODE_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Node.js/Prisma"
 
 # Node.js/Prisma app lives here
 WORKDIR /app
+
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/turbo.json ./turbo.json
 
 # Set production environment
 ENV NODE_ENV="production"
@@ -29,7 +42,8 @@ COPY prisma .
 RUN npx prisma generate
 
 # Copy application code
-COPY . .
+# COPY --from=pruner /app/ .
+COPY --from=pruner /app/out/full/ .
 
 # Build application
 RUN npm run build
