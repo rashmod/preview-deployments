@@ -42,31 +42,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend (restore dependencies)
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Setup Node.js for backend (restore dependencies)
-        uses: actions/setup-node@v3
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-
 
-      - name: Install frontend dependencies
-        run: npm ci --prefix frontend
-
-      - name: Install backend dependencies
-        run: npm ci --prefix backend
-
-      - name: Run tests for frontend
-        run: npm run test --prefix frontend
-
-      - name: Run tests for backend
-        run: npm run test --prefix backend
+      - name: Run tests
+        run: npm run test
 
   build:
     needs: test
