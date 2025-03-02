@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         # if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: Run lint
         run: npm run lint
