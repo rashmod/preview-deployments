@@ -136,6 +136,7 @@ jobs:
         uses: rashmod/fly-pr-review-apps@main
         with:
           # path: apps/backend
+          config: apps/backend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
           postgres: new
           # postgres: backend-wild-firefly-7466-db
