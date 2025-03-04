@@ -31,7 +31,7 @@ ENV NODE_ENV="production"
 # ------ BUILD STAGE ------
 # Throw-away build stage to reduce size of final image
 FROM base AS build
-WORKDIR /app
+WORKDIR /app/apps/backend
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -43,11 +43,11 @@ RUN npm ci --include=dev
 
 # Copy application code
 # COPY --from=pruner /app/ .
-COPY --from=pruner /app/out/full/ /app
+COPY --from=pruner /app/out/full/apps/backend /app/apps/backend
 
 # Generate Prisma Client
 # COPY prisma .
-RUN npx prisma generate --schema ./apps/backend/prisma/schema.prisma
+RUN npx prisma generate --schema prisma/schema.prisma
 
 # Build application
 RUN npm run build
@@ -58,6 +58,7 @@ RUN npm prune --omit=dev
 
 # Final stage for app image
 FROM base
+WORKDIR /app/apps/backend
 
 # Install packages needed for deployment
 RUN apt-get update -qq && \
@@ -65,8 +66,8 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built application
-COPY --from=build /app /app
+COPY --from=build /app/apps/backend /app/apps/backend
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["node", "apps/backend/dist/index.js"]
+CMD ["node", "dist/index.js"]
