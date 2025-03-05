@@ -42,7 +42,7 @@ RUN apt-get update -qq && \
 RUN npm ci --include=dev
 
 # Copy application code
-# COPY --from=pruner /app/ .
+COPY --from=pruner /app/ /app/
 COPY --from=pruner /app/out/full /app
 
 # Generate Prisma Client
