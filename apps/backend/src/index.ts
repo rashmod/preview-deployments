@@ -15,12 +15,18 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (_, res) => {
-  console.log(add(1, 2));
-  console.log(sub(1, 2));
-  console.log(mul(1, 2));
-  console.log(div(1, 2));
+  const x = Math.ceil(Math.random() * 10);
+  const y = Math.ceil(Math.random() * 10);
 
-  res.send("Hello World!");
+  res.json({
+    message: "Hello World!",
+    x,
+    y,
+    add: add(x, y),
+    sub: sub(x, y),
+    mul: mul(x, y),
+    div: div(x, y),
+  });
 });
 
 app.get("/hello", (_, res) => {
