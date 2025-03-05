@@ -1,0 +1,28 @@
+{
+  "name": "@repo/utils",
+  "version": "1.0.0",
+  "packageManager": "npm@10.8.2",
+  "type": "module",
+  "main": "./dist/math.js",
+  "exports": {
+    "./math": {
+      "import": "./dist/math.js",
+      "types": "./src/math.ts"
+    }
+  },
+  "scripts": {
+    "start": "node ./dist/index.js",
+    "dev": "nodemon ./src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
