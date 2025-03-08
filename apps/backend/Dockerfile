@@ -7,7 +7,8 @@ ARG NODE_VERSION=20.17.0
 FROM node:${NODE_VERSION}-slim AS pruner
 
 WORKDIR /app
-RUN corepack enable && pnpm add -g turbo
+RUN npm install -g pnpm
+RUN pnpm add -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
