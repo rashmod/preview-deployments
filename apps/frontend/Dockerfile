@@ -62,7 +62,7 @@ RUN npm prune --omit=dev
 FROM nginx
 
 # Copy built application
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/apps/frontend/dist /usr/share/nginx/html
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 80

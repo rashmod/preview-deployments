@@ -11,6 +11,7 @@ RUN npm install -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
+
 # ------ BASE STAGE ------
 FROM node:${NODE_VERSION}-slim AS base
 
