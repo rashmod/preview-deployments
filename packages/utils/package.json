@@ -12,8 +12,8 @@
   },
   "scripts": {
     "start": "node ./dist/math.js",
-    "dev": "tsup ./src/math.ts --out-dir ./dist --watch",
-    "build": "tsc ./src/math.ts --out-dir ./dist"
+    "dev": "tsup --watch",
+    "build": "tsup"
   },
   "keywords": [],
   "author": "",
