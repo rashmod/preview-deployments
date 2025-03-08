@@ -6,8 +6,11 @@ ARG NODE_VERSION=20.17.0
 # ------ PRUNING STAGE ------
 FROM node:${NODE_VERSION}-slim AS pruner
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 WORKDIR /app
-RUN npm install -g pnpm
 RUN pnpm add -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
