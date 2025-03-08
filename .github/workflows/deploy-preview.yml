@@ -14,64 +14,74 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
-        run: npm ci --prefix frontend
-
-      - name: Setup Node.js for backend
-        uses: actions/setup-node@v3
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-
 
-      - name: Install backend dependencies
-        run: npm ci --prefix backend
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run lint for backend
-        run: npm run lint --prefix backend
-
-      - name: Run lint for frontend
-        run: npm run lint --prefix frontend
-
-  test:
+  lint:
     needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend (restore dependencies)
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Setup Node.js for backend (restore dependencies)
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: backend/package-lock.json
 
-      - name: Install frontend dependencies
-        run: npm ci --prefix frontend
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
-      - name: Install backend dependencies
-        run: npm ci --prefix backend
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run tests for frontend
-        run: npm run test --prefix frontend
-
-      - name: Run tests for backend
-        run: npm run test --prefix backend
+      - name: Run tests
+        run: npm run test
 
   build:
     needs: test
@@ -80,31 +90,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend (restore dependencies)
-        uses: actions/setup-node@v3
+      - name: Restore dependencies
+        uses: actions/cache@v3
         with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
-      - name: Setup Node.js for backend (restore dependencies)
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Install frontend dependencies
-        run: npm ci --prefix frontend
-
-      - name: Install backend dependencies
-        run: npm ci --prefix backend
-
-      - name: Build backend
-        run: npm run build --prefix backend
-
-      - name: Build frontend
-        run: npm run build --prefix frontend
+      - name: Build
+        run: npm run build
 
   preview-deploy:
     needs: build
@@ -129,8 +126,8 @@ jobs:
 
       - name: Read Fly.io App Name
         run: |
-          BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' backend/fly.toml)
-          FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' frontend/fly.toml)
+          BACKEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' apps/backend/fly.toml)
+          FRONTEND_APP_NAME=$(awk -F " = '" '/^app = /{gsub(/'\''/, "", $2); print $2}' apps/frontend/fly.toml)
           echo "BACKEND_APP_NAME=$BACKEND_APP_NAME" >> $GITHUB_ENV
           echo "FRONTEND_APP_NAME=$FRONTEND_APP_NAME" >> $GITHUB_ENV
 
@@ -138,7 +135,8 @@ jobs:
         id: deploy-backend
         uses: rashmod/fly-pr-review-apps@main
         with:
-          path: backend
+          # path: apps/backend
+          config: apps/backend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
           postgres: new
           # postgres: backend-wild-firefly-7466-db
@@ -147,7 +145,7 @@ jobs:
         id: deploy-frontend
         uses: rashmod/fly-pr-review-apps@main
         with:
-          path: frontend
+          config: apps/frontend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
           # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
           build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"

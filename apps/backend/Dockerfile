@@ -2,6 +2,17 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.17.0
+
+# ------ PRUNING STAGE ------
+FROM node:${NODE_VERSION}-slim AS pruner
+
+WORKDIR /app
+RUN npm install -g turbo
+COPY . .
+RUN turbo prune --scope=backend --docker
+
+
+# ------ BASE STAGE ------
 FROM node:${NODE_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Node.js/Prisma"
@@ -9,27 +20,31 @@ LABEL fly_launch_runtime="Node.js/Prisma"
 # Node.js/Prisma app lives here
 WORKDIR /app
 
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/package-lock.json ./package-lock.json
+COPY --from=pruner /app/turbo.json ./turbo.json
+
 # Set production environment
 ENV NODE_ENV="production"
 
 
+# ------ BUILD STAGE ------
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+WORKDIR /app
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
 # Install node modules
-COPY package-lock.json package.json ./
 RUN npm ci --include=dev
 
-# Generate Prisma Client
-COPY prisma .
-RUN npx prisma generate
-
 # Copy application code
-COPY . .
+COPY --from=pruner /app/out/full /app
+
+# Generate Prisma Client
+RUN npx prisma generate --schema apps/backend/prisma/schema.prisma
 
 # Build application
 RUN npm run build
@@ -51,4 +66,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+CMD ["node", "apps/backend/dist/index.js"]

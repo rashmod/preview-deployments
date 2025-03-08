@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDatabase, prisma } from "./db";
 
+import { add, sub, mul, div } from "@repo/utils";
+
 dotenv.config();
 
 connectDatabase();
@@ -13,7 +15,18 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (_, res) => {
-  res.send("Hello World!");
+  const x = Math.ceil(Math.random() * 10);
+  const y = Math.ceil(Math.random() * 10);
+
+  res.json({
+    message: "Hello World!",
+    x,
+    y,
+    add: add(x, y),
+    sub: sub(x, y),
+    mul: mul(x, y),
+    div: div(x, y),
+  });
 });
 
 app.get("/hello", (_, res) => {

@@ -1,11 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "packageManager": "npm@10.8.2",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node ./dist/index.js",
-    "dev": "nodemon ./src/index.ts",
-    "build": "tsc",
+    "dev": "tsup --watch ./src/index.ts",
+    "build": "tsup",
     "lint": "eslint .",
     "test": "vitest"
   },
@@ -18,7 +20,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "pg": "^8.13.3"
+    "pg": "^8.13.3",
+    "@repo/utils": "*"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
@@ -33,6 +36,7 @@
     "prisma": "^6.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
-    "vitest": "^3.0.7"
+    "vitest": "^3.0.7",
+    "tsup": "^8.4.0"
   }
 }

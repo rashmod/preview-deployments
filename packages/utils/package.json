@@ -1,0 +1,29 @@
+{
+  "name": "@repo/utils",
+  "version": "1.0.0",
+  "packageManager": "npm@10.8.2",
+  "type": "module",
+  "main": "./dist/math.js",
+  "exports": {
+    ".": {
+      "import": "./dist/math.js",
+      "types": "./src/math.ts"
+    }
+  },
+  "scripts": {
+    "start": "node ./dist/math.js",
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "tsup": "^8.4.0"
+  }
+}
