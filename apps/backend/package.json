@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "packageManager": "npm@10.8.2",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node ./dist/index.js",
     "dev": "nodemon ./src/index.ts",
-    "build": "tsc",
+    "build": "tsup",
     "lint": "eslint .",
     "test": "vitest"
   },

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDatabase, prisma } from "./db";
 
-import { add, sub, mul, div } from "@repo/utils/math";
+import { add, sub, mul, div } from "@repo/utils";
 
 dotenv.config();
 

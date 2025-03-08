@@ -11,6 +11,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
+    "tsup": "^8.4.0",
     "turbo": "^2.4.4"
   }
 }
