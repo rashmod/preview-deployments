@@ -20,8 +20,13 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - name: Enable corepack & install dependencies
-        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Enable corepack & install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
   lint:
     needs: setup
@@ -35,6 +40,11 @@ jobs:
         with:
           node-version: 18
           cache: pnpm
+
+      - name: Enable corepack & install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -55,6 +65,11 @@ jobs:
           node-version: 18
           cache: pnpm
 
+      - name: Enable corepack & install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -73,6 +88,11 @@ jobs:
         with:
           node-version: 18
           cache: pnpm
+
+      - name: Enable corepack & install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
