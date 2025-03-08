@@ -18,18 +18,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
+          cache: pnpm
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: ${{ runner.os }}-
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack & install dependencies
+        run: corepack enable && pnpm install --frozen-lockfile
 
   lint:
     needs: setup
@@ -42,20 +34,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
-
-      - name: Restore dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run lint
-        run: npm run lint
+        run: pnpm run lint
 
   test:
     needs: lint
@@ -68,20 +53,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
-
-      - name: Restore dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npm run test
+        run: pnpm run test
 
   build:
     needs: test
@@ -90,18 +68,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore dependencies
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
+          node-version: 18
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
   preview-deploy:
     needs: build
@@ -135,7 +112,6 @@ jobs:
         id: deploy-backend
         uses: rashmod/fly-pr-review-apps@main
         with:
-          # path: apps/backend
           config: apps/backend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.BACKEND_APP_NAME }}
           postgres: new
@@ -147,5 +123,4 @@ jobs:
         with:
           config: apps/frontend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
-          # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
           build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
