@@ -145,7 +145,7 @@ jobs:
         id: deploy-frontend
         uses: rashmod/fly-pr-review-apps@main
         with:
-          path: apps/frontend
+          config: apps/frontend/fly.toml
           name: pr-${{ github.event.number }}-${{ env.FRONTEND_APP_NAME }}
           # launch_options: "--build-arg VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
           build_args: "VITE_API_URL=${{ steps.deploy-backend.outputs.url }}"
