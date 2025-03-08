@@ -7,7 +7,7 @@ ARG NODE_VERSION=20.17.0
 FROM node:${NODE_VERSION}-slim AS pruner
 
 WORKDIR /app
-RUN npm install -g turbo
+RUN corepack enable && pnpm add -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
@@ -21,7 +21,7 @@ LABEL fly_launch_runtime="Node.js/Prisma"
 WORKDIR /app
 
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-lock.json ./package-lock.json
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/turbo.json ./turbo.json
 
 # Set production environment
@@ -37,20 +37,20 @@ WORKDIR /app
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
-# Install node modules
-RUN npm ci --include=dev
+# Install dependencies
+RUN pnpm install --frozen-lockfile
 
 # Copy application code
 COPY --from=pruner /app/out/full /app
 
 # Generate Prisma Client
-RUN npx prisma generate --schema apps/backend/prisma/schema.prisma
+RUN pnpm prisma generate --schema apps/backend/prisma/schema.prisma
 
 # Build application
-RUN npm run build
+RUN pnpm run build
 
 # Remove development dependencies
-RUN npm prune --omit=dev
+RUN pnpm prune --prod
 
 
 # Final stage for app image
