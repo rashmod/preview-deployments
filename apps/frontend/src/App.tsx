@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
+import { add, sub, mul, div } from "@repo/utils";
+
 import {
   Form,
   FormControl,
@@ -57,6 +59,9 @@ function App() {
     mutation.mutate(values.title);
   }
 
+  const x = Math.ceil(Math.random() * 10);
+  const y = Math.ceil(Math.random() * 10);
+
   useEffect(() => {
     fetch(`${API_URL}/hello`)
       .then((response) => response.text())
@@ -76,6 +81,16 @@ function App() {
   return (
     <div className="w-1/2 mx-auto py-4">
       <h1 className="text-2xl font-bold mb-2">Live Preview</h1>
+      <ul>
+        <li>
+          x = {x}, y = {y}
+        </li>
+        <li>add = {add(x, y)}</li>
+        <li>sub = {sub(x, y)}</li>
+        <li>mul = {mul(x, y)}</li>
+        <li>div = {div(x, y)}</li>
+      </ul>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4">
           <FormField
