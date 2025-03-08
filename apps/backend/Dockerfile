@@ -11,7 +11,6 @@ RUN npm install -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
-
 # ------ BASE STAGE ------
 FROM node:${NODE_VERSION}-slim AS base
 
@@ -38,15 +37,12 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
 # Install node modules
-# COPY package-lock.json package.json ./
 RUN npm ci --include=dev
 
 # Copy application code
-# COPY --from=pruner /app/ /app/
 COPY --from=pruner /app/out/full /app
 
 # Generate Prisma Client
-# COPY prisma .
 RUN npx prisma generate --schema apps/backend/prisma/schema.prisma
 
 # Build application
