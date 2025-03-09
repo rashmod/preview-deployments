@@ -1,7 +1,6 @@
 {
   "name": "@repo/utils",
   "version": "1.0.0",
-  "packageManager": "npm@10.8.2",
   "type": "module",
   "main": "./dist/math.js",
   "exports": {

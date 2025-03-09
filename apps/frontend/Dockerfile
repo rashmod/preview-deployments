@@ -6,8 +6,12 @@ ARG NODE_VERSION=20.17.0
 # ------ PRUNING STAGE ------
 FROM node:${NODE_VERSION}-slim AS pruner
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
 WORKDIR /app
-RUN npm install -g turbo
+RUN pnpm add -g turbo
 COPY . .
 RUN turbo prune --scope=frontend --docker
 
@@ -21,7 +25,7 @@ LABEL fly_launch_runtime="Vite"
 WORKDIR /app
 
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-lock.json ./package-lock.json
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/turbo.json ./turbo.json
 
 # Set production environment
@@ -44,18 +48,18 @@ ENV VITE_API_URL=$VITE_API_URL
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
 
-# Install node modules
-COPY package-lock.json package.json ./
-RUN npm ci --include=dev
+# Install dependencies
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile
 
 # Copy application code
 COPY --from=pruner /app/out/full /app
 
 # Build application
-RUN npm run build
+RUN pnpm run build
 
 # Remove development dependencies
-RUN npm prune --omit=dev
+RUN pnpm prune --prod
 
 
 # Final stage for app image
