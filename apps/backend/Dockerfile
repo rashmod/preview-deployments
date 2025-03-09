@@ -6,6 +6,8 @@ ARG NODE_VERSION=20.17.0
 # ------ PRUNING STAGE ------
 FROM node:${NODE_VERSION}-slim AS pruner
 
+RUN corepack disable
+
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
