@@ -8,10 +8,10 @@ FROM node:${NODE_VERSION}-slim AS pruner
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@9.15.4
 # RUN corepack enable
 
 WORKDIR /app
-RUN npm install -g pnpm@9.15.4
 RUN pnpm add -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
@@ -19,6 +19,10 @@ RUN turbo prune --scope=backend --docker
 
 # ------ BASE STAGE ------
 FROM node:${NODE_VERSION}-slim AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@9.15.4
 
 LABEL fly_launch_runtime="Node.js/Prisma"
 
