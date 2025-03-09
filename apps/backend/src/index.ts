@@ -1,13 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { connectDatabase, prisma } from "./db";
-
-import { add, sub, mul, div } from "@repo/utils";
 
 dotenv.config();
 
-connectDatabase();
+import { add, sub, mul, div } from "@repo/utils";
+import { db } from "./db";
+import { todoSchema } from "./db/schema";
 
 const app = express();
 
@@ -39,17 +38,14 @@ app.get("/hello/:name", (req, res) => {
 });
 
 app.get("/todos", async (_req, res) => {
-  const todos = await prisma.todo.findMany();
+  const todos = await db.select().from(todoSchema);
   res.json(todos);
 });
 
 app.post("/todos", async (req, res) => {
   const { title } = req.body;
-  const todo = await prisma.todo.create({
-    data: {
-      title,
-    },
-  });
+
+  const [todo] = await db.insert(todoSchema).values({ title }).returning();
   res.json(todo);
 });
 
