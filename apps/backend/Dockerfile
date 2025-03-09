@@ -6,13 +6,10 @@ ARG NODE_VERSION=20.17.0
 # ------ PRUNING STAGE ------
 FROM node:${NODE_VERSION}-slim AS pruner
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@9.15.4
-# RUN corepack enable
+RUN corepack disable
 
 WORKDIR /app
-RUN pnpm add -g turbo
+RUN npm install -g turbo
 COPY . .
 RUN turbo prune --scope=backend --docker
 
@@ -20,26 +17,24 @@ RUN turbo prune --scope=backend --docker
 # ------ BASE STAGE ------
 FROM node:${NODE_VERSION}-slim AS base
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@9.15.4
+LABEL fly_launch_runtime="Node.js"
 
-LABEL fly_launch_runtime="Node.js/Prisma"
-
-# Node.js/Prisma app lives here
+# Node.js app lives here
 WORKDIR /app
 
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/turbo.json ./turbo.json
 
-# Set production environment
-ENV NODE_ENV="production"
-
-
 # ------ BUILD STAGE ------
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@9
+# RUN corepack enable
+
 WORKDIR /app
 
 # Install packages needed to build node modules
@@ -49,13 +44,12 @@ RUN apt-get update -qq && \
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm list prisma
+# Set production environment
+ENV NODE_ENV="production"
+
 
 # Copy application code
 COPY --from=pruner /app/out/full /app
-
-# Generate Prisma Client
-RUN pnpm exec prisma generate --schema apps/backend/prisma/schema.prisma
 
 # Build application
 RUN pnpm run build
