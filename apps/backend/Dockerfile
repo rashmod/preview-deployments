@@ -49,11 +49,13 @@ RUN apt-get update -qq && \
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
+RUN pnpm list prisma
+
 # Copy application code
 COPY --from=pruner /app/out/full /app
 
 # Generate Prisma Client
-RUN pnpm prisma generate --schema apps/backend/prisma/schema.prisma
+RUN pnpm exec prisma generate --schema apps/backend/prisma/schema.prisma
 
 # Build application
 RUN pnpm run build
