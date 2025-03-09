@@ -40,7 +40,7 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile --loglevel=debug
+RUN pnpm install --frozen-lockfile
 
 # Set production environment
 ENV NODE_ENV="production"
